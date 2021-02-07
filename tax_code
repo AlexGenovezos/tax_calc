@@ -1,0 +1,25 @@
+  def tax(orders, tax_rates ), do: _tax([], orders, tax_rates)
+  defp _math(acc, h, t, tax_rates, math) do
+    add_on = [total_amount: math]
+    nl = Keyword.merge(h,add_on)
+    newlist = Enum.map(nl, fn {a, b} -> {a, b} end)
+    _tax([newlist|acc], t, tax_rates)
+  end
+  defp _tax(acc,[], _tax_rates), do: Enum.reverse(acc)
+  defp _tax(acc,[h|t], tax_rates), do: _tax(acc, h, t, tax_rates)
+  def _tax(acc, h, t, tax_rates) do
+    case Keyword.get(h, :ship_to) do
+      :NC ->
+        net_amount = Keyword.get(h, :net_amount)
+        rate = Keyword.get(tax_rates, :NC)
+        math = ((net_amount * rate) + net_amount)
+        _math(acc, h, t, tax_rates, math)
+      :TX ->
+        net_amount = Keyword.get(h, :net_amount)
+        rate = Keyword.get(tax_rates, :TX)
+        math = ((net_amount * rate) + net_amount)
+        _math(acc, h, t, tax_rates, math)
+      _ ->
+        net_amount = Keyword.get(h, :net_amount)
+        _math(acc, h, t, tax_rates, net_amount)
+    end
